@@ -1,35 +1,94 @@
-# Perpetual-calendar
-Perpetual calendar based on STM32F103C8T6.This is a simple course design.All the functions have not been completed yet.
-基于STM32F103C8T6的万年历。
-这是一个简单的单片机课程设计
-目前还没有完成了基础功能
-已实现的功能有：
-  1 显示年月日时分秒和星期几
-  2 可以在十二小时制和二十四小时制之间进行切换
-  3 闹钟功能
-    1）最多可添加五个闹钟
-    2）闹钟可以设置单次响铃或指定日响铃
-    3）添加闹钟后，闹钟列表会自动按照时间排序
-    4）到达闹钟时间，蜂鸣器会响，LED会同步闪烁
-  4 倒计时功能
-    1）倒计时时间到同样会触发蜂鸣器和LED提示
-    2）倒计时开始后，可以切换到其他页面进行操作，不影响倒计时的进行
-    3）倒计时可暂停，可复位
-  5 秒表功能
-    1）秒表计时上限为99:99:99
-    2）秒表运行过程中，可以切换到其他页面，不影响秒表的走时
-    3）秒表可暂停，可复位
-  6 可以设置年月日时分秒
-    1）V1.0版本目前只实现了手动设置时间
-    2）V2.0版本原计划打算使用ESP8266（ESP01）+STM32进行网络自动授时，由于时间关系未能实现
-  7 日历显示
-    1）可以根据当前的日期（阳历）（阳历可计算范围1900年1月31日起），自动计算阴历时间
-    2）V2.0版本设想：通过网络自动授时的同时，完成更多万年历的操作，例如显示节假日，节气等
-  8 天气
-    1）由于天气依赖于WiFi模块，因此也在V2.0版本中计划实现，但受限于时间，本人将不再更新V2.0
-    2）天气选项仍保留在菜单当中，可以删除此项，天气选项无法使用
-V2.0版本前瞻
-  1 天气
-    1）在V1.0的菜单中保留了此项，但没有相关的跳转
-  2 网络自动授时
-    1）通过ESP8266实现对网络的访问，在设计V1.0版本时，计划使用AT指令实现，受限于时间因素，未能完善此功能，因此放置于V2.0版本前瞻
+# 📅 万年历 / Perpetual Calendar
+
+基于 **STM32F103C8T6** 的万年历课程设计项目，已实现基础功能，支持阳历、阴历、闹钟、倒计时等常用功能。
+
+A **perpetual calendar** project based on **STM32F103C8T6**, designed as a simple embedded systems course project. Basic features such as time display, alarm, countdown, and lunar calendar conversion are implemented.
+
+---
+
+## ✅ 已实现功能 / Implemented Features (V1.0)
+
+### 📆 时间显示 / Time Display
+- 显示 年、月、日、时、分、秒、星期  
+  Display of year, month, day, hour, minute, second, and weekday  
+- 支持 12 小时制与 24 小时制切换  
+  Supports 12-hour and 24-hour time formats  
+
+### ⏰ 闹钟 / Alarm
+- 最多添加 5 个闹钟  
+  Up to 5 alarms  
+- 支持单次响铃与指定日期循环响铃  
+  One-time or specific-date repeating alarms  
+- 自动按时间排序  
+  Auto-sorted by alarm time  
+- 闹钟响铃时蜂鸣器响，LED 闪烁  
+  Buzzer sounds and LED blinks when triggered  
+
+### ⏳ 倒计时 / Countdown
+- 倒计时结束蜂鸣器与 LED 提示  
+  Buzzer and LED notification on timeout  
+- 倒计时过程中可切换界面，计时不中断  
+  Timer continues running when switching pages  
+- 支持暂停与复位  
+  Supports pause and reset  
+
+### ⌚ 秒表 / Stopwatch
+- 最大时间 99:99:99  
+  Max time: 99:99:99  
+- 可在其他界面后台运行  
+  Runs in background  
+- 支持暂停与复位  
+  Supports pause and reset  
+
+### 🛠️ 时间设置 / Manual Time Setting
+- 支持手动设置年月日时分秒  
+  Manual setting of year, month, day, hour, minute, second  
+- V1.0 仅实现手动设置，未来计划支持网络授时  
+  Only manual setting in V1.0; network sync planned in future  
+
+### 🗓️ 日历与阴历转换 / Calendar & Lunar Conversion
+- 根据阳历自动计算对应阴历  
+  Automatically convert solar to lunar date  
+- 计算起始时间为 1900 年 1 月 31 日  
+  Supports conversion starting from Jan 31, 1900  
+
+---
+
+## 🚧 V2.0 版本前瞻 / Future Plans (V2.0 - Unfinished)
+
+### 🌐 网络自动授时 / Network Time Sync
+- 计划使用 ESP8266（ESP01）模块 + AT 指令获取网络时间  
+  Planned to use ESP8266 + AT commands for online time sync  
+- 因时间关系未能实现  
+  Not implemented due to time constraints  
+
+### 🌤️ 天气功能 / Weather Display
+- 通过 WiFi 模块获取天气数据  
+  Planned weather display using WiFi module  
+- 菜单中保留此项，但当前未启用  
+  Option remains in menu but is non-functional  
+
+### 📅 节假日与节气显示 / Holidays & Solar Terms
+- 原计划通过网络同步显示节假日、节气  
+  Planned to display holidays and solar terms via network  
+- 暂未开发  
+  Not implemented  
+
+---
+
+## 📌 开发说明 / Notes
+
+- 当前版本：`V1.0`  
+  Current version: `V1.0`
+- 开发板型号：`STM32F103C8T6`  
+  Board: `STM32F103C8T6`
+- 网络功能与天气功能已不再更新，可删除菜单中的天气选项  
+  Network/weather features are no longer updated; feel free to remove the weather option from the menu
+
+---
+
+## 🙌 欢迎参与 / Contribution
+
+欢迎 fork、issue 或 PR 来改进此项目。  
+Feel free to fork, open issues, or submit PRs to improve this project!
+
