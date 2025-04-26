@@ -5,6 +5,8 @@
 #include "MyRTC.h"
 #include "Key.h"
 #include "OLED.h"
+#include "Encoder.h"
+#include "SolarToLunar.h"
 
 void TimeModify(void);
 
@@ -112,7 +114,7 @@ void DisplayTempTime(uint16_t* TempRTC_Time)
 //获取硬件RTC的时间，显示全局数组 MyRTC_Time
 void RTCTimeDisplay(void)
 {
-	MyRTC_ReadTime();
+	//MyRTC_ReadTime();
 	//只会刷新屏幕上被修改显存的地方
 	OLED_ShowNum(0, 0, MyRTC_Time[0], 4, OLED_6X8);//年
 	OLED_ShowNum(30, 0, MyRTC_Time[1], 2, OLED_6X8);//月
@@ -148,6 +150,7 @@ void RTCTimeDisplay(void)
 //连接符的显示
 void Display_ClockTitle(void)
 {
+	OLED_Clear();
 	//规范各个值显示的位置，并提前画好连接符
 	OLED_ShowString(0, 0, "XXXX-XX-XX", OLED_6X8);		//年月日在左上角左对齐显示，像素的范围：X(00,59),Y(00,07)
 	OLED_ShowString(32, 24, "XX:XX:XX", OLED_8X16);		//时间水平垂直居中显示，像素的范围：X(32,95),Y(24,29)
@@ -163,20 +166,21 @@ void ClockDisplay(void)
 	{
 		//按下的按键
 		uint8_t key = Key_GetNum();
-		//切换为修改时间模式
-		if (key == 4)
+		//调出菜单
+		if (key == 1 || key == 2 || key == 3 || Encoder_Down_Flag == 1 || Encoder_Up_Flag == 1)
 		{
-			TimeModify();
+			break;
 		}
 		//24小时制和12小时制的切换
-		else if (key == 3)
+		else if (key == 4)
 		{
 			flag24_12 = ! flag24_12;
 		}
 		
 		RTCTimeDisplay();		//显示RTC时钟
-		
 	}
+	OLED_Clear();
+	OLED_Update();
 }
 /**************************************显示函数*/
 
@@ -184,6 +188,8 @@ void ClockDisplay(void)
 /*时间修改函数**********************************/
 void TimeModify(void)
 {
+	OLED_Clear();
+	
 	//显示时钟连接符
 	Display_ClockTitle();
 	
@@ -226,38 +232,59 @@ void TimeModify(void)
 		}
 		else
 		{
-			OLED_ClearArea(LinePosition[0], LinePosition[1], LinePosition[2], LinePosition[3]);
+			OLED_EraseLine(LinePosition[0], LinePosition[1], LinePosition[2], LinePosition[3]);
 		}
 		OLED_Update();
 
-		//按下的按键
-		uint8_t key = Key_GetNum();
 		
-		/*按键功能**********************************/
-		//如果按下KEY_1，就切换要修改的位
-		if (key == 1)
+		//使用旋转编码器代替原先KEY2和KEY3的加减功能
+		if (Encoder_Down_Flag == 1 || Encoder_Up_Flag == 1)
 		{
-			//将光标移至下一个位置
-			OLED_ClearArea(LinePosition[0], LinePosition[1], LinePosition[2], LinePosition[3]);
-			OLED_UpdateArea(LinePosition[0], LinePosition[1], LinePosition[2], LinePosition[3]);
-			
-			//确保要修改的时间位在 年月日时分秒 中选择
-			TimePara = (TimePara + 1) % 6;		
-		}
-		
-		//如果按下KEY_2当前位增加1，如果按下KEY_3当前位减小1
-		else if (key == 2 || key == 3)
-		{
-			int8_t delta = (key == 2) ? 1 : -1;
-			
+			int8_t delta = (Encoder_Up_Flag == 1) ? 1 : -1;
+			Encoder_Down_Flag = 0;
+			Encoder_Up_Flag = 0;
 			//确保TimePara和TempRTC_Time数组的对应关系
 			TempRTC_Time[(TimePara + 3) % 6] += delta;
 			
 			//保证对应的数在范围内滚动切换
 			AdjustRTC_TimeRange(TempRTC_Time);
+
 		}
 		
+		//按下的按键
+		uint8_t key = Key_GetNum();
 		
+		/*按键功能**********************************/
+		//如果按下KEY_3，就切换要修改的位
+		if (key == 3)
+		{
+			//将光标移至下一个位置
+			OLED_EraseLine(LinePosition[0], LinePosition[1], LinePosition[2], LinePosition[3]);
+			OLED_Update();
+			
+			//确保要修改的时间位在 年月日时分秒 中选择
+			TimePara = (TimePara + 1) % 6;		
+		}
+		
+//		//如果按下KEY_2当前位增加1，如果按下KEY_3当前位减小1
+//		else if (key == 2 || key == 3)
+//		{
+//			int8_t delta = (key == 2) ? 1 : -1;
+//			
+//			//确保TimePara和TempRTC_Time数组的对应关系
+//			TempRTC_Time[(TimePara + 3) % 6] += delta;
+//			
+//			//保证对应的数在范围内滚动切换
+//			AdjustRTC_TimeRange(TempRTC_Time);
+//		}
+		
+		//KEY1返回时间显示页面
+		else if (key == 1)
+		{
+			break;
+		}
+		
+		//KEY4保存当前设置
 		else if (key == 4) 
 		{
 			for (int i = 0; i < 6; ++i) {
