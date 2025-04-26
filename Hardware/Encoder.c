@@ -1,6 +1,11 @@
 #include "stm32f10x.h"                  // Device header
+#include "Delay.h"
 
-int16_t Encoder_Count;					//全局变量，用于计数旋转编码器的增量值
+//int16_t Encoder_Count;					//全局变量，用于计数旋转编码器的增量值
+
+//全局变量，用来指示旋转编码器顺时针旋转/逆时针旋转
+volatile uint8_t Encoder_Up_Flag = 0;			//顺时针旋转
+volatile uint8_t Encoder_Down_Flag = 0;			//逆时针旋转
 
 /**
   * 函    数：旋转编码器初始化
@@ -39,33 +44,33 @@ void Encoder_Init(void)
 	NVIC_InitTypeDef NVIC_InitStructure;						//定义结构体变量
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;			//选择配置NVIC的EXTI0线
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;				//指定NVIC线路使能
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;	//指定NVIC线路的抢占优先级为1
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;			//指定NVIC线路的响应优先级为1
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;	//指定NVIC线路的抢占优先级为2
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;			//指定NVIC线路的响应优先级为0
 	NVIC_Init(&NVIC_InitStructure);								//将结构体变量交给NVIC_Init，配置NVIC外设
 
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;			//选择配置NVIC的EXTI1线
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;				//指定NVIC线路使能
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;	//指定NVIC线路的抢占优先级为1
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;			//指定NVIC线路的响应优先级为2
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;	//指定NVIC线路的抢占优先级为2
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;			//指定NVIC线路的响应优先级为1
 	NVIC_Init(&NVIC_InitStructure);								//将结构体变量交给NVIC_Init，配置NVIC外设
 }
 
-/**
-  * 函    数：旋转编码器获取增量值
-  * 参    数：无
-  * 返 回 值：自上此调用此函数后，旋转编码器的增量值
-  */
-int16_t Encoder_Get(void)
-{
-	/*使用Temp变量作为中继，目的是返回Encoder_Count后将其清零*/
-	/*在这里，也可以直接返回Encoder_Count
-	  但这样就不是获取增量值的操作方法了
-	  也可以实现功能，只是思路不一样*/
-	int16_t Temp;
-	Temp = Encoder_Count;
-	Encoder_Count = 0;
-	return Temp;
-}
+///**
+//  * 函    数：旋转编码器获取增量值
+//  * 参    数：无
+//  * 返 回 值：自上此调用此函数后，旋转编码器的增量值
+//  */
+//int16_t Encoder_Get(void)
+//{
+//	/*使用Temp变量作为中继，目的是返回Encoder_Count后将其清零*/
+//	/*在这里，也可以直接返回Encoder_Count
+//	  但这样就不是获取增量值的操作方法了
+//	  也可以实现功能，只是思路不一样*/
+//	int16_t Temp;
+//	Temp = Encoder_Count;
+//	Encoder_Count = 0;
+//	return Temp;
+//}
 
 /**
   * 函    数：EXTI0外部中断函数
@@ -77,6 +82,7 @@ int16_t Encoder_Get(void)
   */
 void EXTI0_IRQHandler(void)
 {
+	Delay_us(60);		//软件延时消抖，并尽可能减小阻塞
 	if (EXTI_GetITStatus(EXTI_Line0) == SET)		//判断是否是外部中断0号线触发的中断
 	{
 		/*如果出现数据乱跳的现象，可再次判断引脚电平，以避免抖动*/
@@ -84,7 +90,7 @@ void EXTI0_IRQHandler(void)
 		{
 			if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) == 0)		//PB0的下降沿触发中断，此时检测另一相PB1的电平，目的是判断旋转方向
 			{
-				Encoder_Count --;					//此方向定义为反转，计数变量自减
+				Encoder_Down_Flag = 1;					//此方向定义为反转，计数变量自减
 			}
 		}
 		EXTI_ClearITPendingBit(EXTI_Line0);			//清除外部中断0号线的中断标志位
@@ -103,6 +109,7 @@ void EXTI0_IRQHandler(void)
   */
 void EXTI1_IRQHandler(void)
 {
+	Delay_us(60);		//软件延时消抖，并尽可能减小阻塞
 	if (EXTI_GetITStatus(EXTI_Line1) == SET)		//判断是否是外部中断1号线触发的中断
 	{
 		/*如果出现数据乱跳的现象，可再次判断引脚电平，以避免抖动*/
@@ -110,7 +117,7 @@ void EXTI1_IRQHandler(void)
 		{
 			if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)		//PB1的下降沿触发中断，此时检测另一相PB0的电平，目的是判断旋转方向
 			{
-				Encoder_Count ++;					//此方向定义为正转，计数变量自增
+				Encoder_Up_Flag = 1;					//此方向定义为正转，计数变量自增
 			}
 		}
 		EXTI_ClearITPendingBit(EXTI_Line1);			//清除外部中断1号线的中断标志位

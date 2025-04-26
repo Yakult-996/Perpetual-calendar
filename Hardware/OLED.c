@@ -951,6 +951,22 @@ void OLED_DrawPoint(int16_t X, int16_t Y)
 }
 
 /**
+  * 函    数：OLED在指定位置画一个黑点（清除点）
+  * 参    数：X 指定点的横坐标，范围：-32768~32767，屏幕区域：0~127
+  * 参    数：Y 指定点的纵坐标，范围：-32768~32767，屏幕区域：0~63
+  * 返 回 值：无
+  * 说    明：调用此函数后，要想真正地呈现在屏幕上，还需调用更新函数
+  */
+void OLED_DrawBlackPoint(int16_t X, int16_t Y)
+{
+	if (X >= 0 && X <= 127 && Y >=0 && Y <= 63)		// 超出屏幕的内容不显示
+	{
+		/* 将显存数组指定位置的一个Bit数据清0（擦除该点）*/
+		OLED_DisplayBuf[Y / 8][X] &= ~(0x01 << (Y % 8));
+	}
+}
+
+/**
   * 函    数：OLED获取指定位置点的值
   * 参    数：X 指定点的横坐标，范围：-32768~32767，屏幕区域：0~127
   * 参    数：Y 指定点的纵坐标，范围：-32768~32767，屏幕区域：0~63
@@ -1080,6 +1096,92 @@ void OLED_DrawLine(int16_t X0, int16_t Y0, int16_t X1, int16_t Y1)
 		}	
 	}
 }
+
+
+/**
+  * 函    数：OLED擦除线（通过画黑点替代清除）
+  * 参    数：X0 指定一个端点的横坐标
+  * 参    数：Y0 指定一个端点的纵坐标
+  * 参    数：X1 指定另一个端点的横坐标
+  * 参    数：Y1 指定另一个端点的纵坐标
+  * 说    明：与 OLED_DrawLine 相同，只是用黑点擦除已有线条
+  */
+void OLED_EraseLine(int16_t X0, int16_t Y0, int16_t X1, int16_t Y1)
+{
+	int16_t x, y, dx, dy, d, incrE, incrNE, temp;
+	int16_t x0 = X0, y0 = Y0, x1 = X1, y1 = Y1;
+	uint8_t yflag = 0, xyflag = 0;
+	
+	if (y0 == y1)	// 横线
+	{
+		if (x0 > x1) { temp = x0; x0 = x1; x1 = temp; }
+		for (x = x0; x <= x1; x++)
+		{
+			OLED_DrawBlackPoint(x, y0);	// 画黑点擦除
+		}
+	}
+	else if (x0 == x1)	// 竖线
+	{
+		if (y0 > y1) { temp = y0; y0 = y1; y1 = temp; }
+		for (y = y0; y <= y1; y++)
+		{
+			OLED_DrawBlackPoint(x0, y);	// 画黑点擦除
+		}
+	}
+	else	// 斜线处理
+	{
+		if (x0 > x1)
+		{
+			temp = x0; x0 = x1; x1 = temp;
+			temp = y0; y0 = y1; y1 = temp;
+		}
+		
+		if (y0 > y1)
+		{
+			y0 = -y0;
+			y1 = -y1;
+			yflag = 1;
+		}
+		
+		if (y1 - y0 > x1 - x0)
+		{
+			temp = x0; x0 = y0; y0 = temp;
+			temp = x1; x1 = y1; y1 = temp;
+			xyflag = 1;
+		}
+		
+		dx = x1 - x0;
+		dy = y1 - y0;
+		incrE = 2 * dy;
+		incrNE = 2 * (dy - dx);
+		d = 2 * dy - dx;
+		x = x0;
+		y = y0;
+		
+		if (yflag && xyflag){OLED_DrawBlackPoint(y, -x);}
+		else if (yflag)		{OLED_DrawBlackPoint(x, -y);}
+		else if (xyflag)	{OLED_DrawBlackPoint(y, x);}
+		else				{OLED_DrawBlackPoint(x, y);}
+		
+		while (x < x1)
+		{
+			x++;
+			if (d < 0)
+				d += incrE;
+			else
+			{
+				y++;
+				d += incrNE;
+			}
+			
+			if (yflag && xyflag){OLED_DrawBlackPoint(y, -x);}
+			else if (yflag)		{OLED_DrawBlackPoint(x, -y);}
+			else if (xyflag)	{OLED_DrawBlackPoint(y, x);}
+			else				{OLED_DrawBlackPoint(x, y);}
+		}
+	}
+}
+
 
 /**
   * 函    数：OLED矩形

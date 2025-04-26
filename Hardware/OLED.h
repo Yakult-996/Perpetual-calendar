@@ -49,8 +49,10 @@ void OLED_Printf(int16_t X, int16_t Y, uint8_t FontSize, char *format, ...);
 
 /*绘图函数*/
 void OLED_DrawPoint(int16_t X, int16_t Y);
+void OLED_DrawBlackPoint(int16_t X, int16_t Y);
 uint8_t OLED_GetPoint(int16_t X, int16_t Y);
 void OLED_DrawLine(int16_t X0, int16_t Y0, int16_t X1, int16_t Y1);
+void OLED_EraseLine(int16_t X0, int16_t Y0, int16_t X1, int16_t Y1);
 void OLED_DrawRectangle(int16_t X, int16_t Y, uint8_t Width, uint8_t Height, uint8_t IsFilled);
 void OLED_DrawTriangle(int16_t X0, int16_t Y0, int16_t X1, int16_t Y1, int16_t X2, int16_t Y2, uint8_t IsFilled);
 void OLED_DrawCircle(int16_t X, int16_t Y, uint8_t Radius, uint8_t IsFilled);
