@@ -23,6 +23,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
+#include "MyRTC.h"
+#include "LED.h"
+#include "Buzzer.h"
+#include "Encoder.h"
+#include "Alarm.h"
+#include "CountDownTimer.h"
+#include "StopWatch.h"
+#include "Menu.h"
+#include "SolarToLunar.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
@@ -151,6 +160,111 @@ void SysTick_Handler(void)
 /*void PPP_IRQHandler(void)
 {
 }*/
+
+
+
+//定时器2中断函数，定时器2的定时频率为1Hz
+void TIM2_IRQHandler(void)
+{
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
+	{
+		solarToLunar(MyRTC_Time[0], MyRTC_Time[1], MyRTC_Time[2], &g_lunarDate);
+		//当进入一级菜单时，倒计时十秒无操作，自动返回
+		if (is_Lv_1_Menu_Open == 1)
+		{
+			MenuAutoBackSeconds -=1;
+		}
+		
+		if (AlarmCheck() == 1)
+		{
+			AlarmTriggeredFlag = 1;
+		}
+		//如果闹钟触发
+		if (AlarmTriggeredFlag)
+		{
+			AlarmTriggeredFlag = 0;		//清空触发状态，准备蜂鸣器响铃和LED1闪烁
+			BuzzerActive = 1;			//蜂鸣器进入触发状态
+			BuzzerStage = 0;			//蜂鸣器阶段重置
+		}
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	}
+}
+
+//定时器3中断函数，定时器3的定时频率为10Hz，优先级高于定时器2
+
+uint8_t CountDownN = 0;
+void TIM3_IRQHandler(void)
+{
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == SET)
+	{
+		//秒表相关
+		if (StopWatch_isStart == 1)
+		{
+			StopWatch_deciSecond ++;
+		}
+		
+		MyRTC_ReadTime();
+		//倒计时的时间倒数
+		if (CountDownTimer_StartFlag == 1)
+		{
+			CountDownN++;
+			//以10hz计数，每计10个数，倒计时时间-1s
+			if (CountDownN >= 10)
+			{
+				CountDownN = 0;
+				//若倒计时没有计到0，则继续倒计时
+				if (CountDown_Seconds > 0)
+					CountDown_Seconds--;
+				//若倒计时计到0，则触发响铃
+				else if (CountDown_Seconds == 0)
+				{
+                    ResetTimer();
+                    BuzzerActive = 1;  // 启动蜂鸣器提醒
+					BuzzerStage = 0;			//蜂鸣器阶段重置
+                }
+			}
+		}
+		//响铃
+		if (BuzzerActive == 1)
+		{
+			//响0.1s停0.1s再响0.1s停0.7s，实现响铃的效果
+			if (BuzzerStage == 0 || BuzzerStage == 2)
+			{
+				Buzzer_ON();
+				LED1_ON();
+			}
+			if (BuzzerStage == 1 || BuzzerStage == 3)
+			{
+				Buzzer_OFF();
+				LED1_OFF();
+			}
+
+			BuzzerStage ++;
+			if (BuzzerStage > 9)
+				BuzzerStage = 0;		//循环下一秒
+		}
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+	}
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+    if (EXTI_GetITStatus(EXTI_Line5) != RESET)
+    {
+        // 按下 KEY5，响铃中则关闭
+        if (BuzzerActive == 1)
+        {
+            Buzzer_OFF();
+            LED1_OFF();
+            BuzzerActive = 0;
+        }
+
+        // 清除中断标志
+        EXTI_ClearITPendingBit(EXTI_Line5);
+    }
+}
+
+
 
 /**
   * @}
