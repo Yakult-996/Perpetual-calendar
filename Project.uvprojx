@@ -775,6 +775,26 @@
               <FilePath>.\App\Alarm.h</FilePath>
             </File>
             <File>
+              <FileName>CountDownTimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\CountDownTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>CountDownTimer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\CountDownTimer.h</FilePath>
+            </File>
+            <File>
+              <FileName>StopWatch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\StopWatch.c</FilePath>
+            </File>
+            <File>
+              <FileName>StopWatch.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\StopWatch.h</FilePath>
+            </File>
+            <File>
               <FileName>Menu.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\App\Menu.c</FilePath>
@@ -783,6 +803,26 @@
               <FileName>Menu.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\App\Menu.h</FilePath>
+            </File>
+            <File>
+              <FileName>SolarToLunar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\SolarToLunar.c</FilePath>
+            </File>
+            <File>
+              <FileName>SolarToLunar.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\SolarToLunar.h</FilePath>
+            </File>
+            <File>
+              <FileName>Calendar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\Calendar.c</FilePath>
+            </File>
+            <File>
+              <FileName>Calendar.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\Calendar.h</FilePath>
             </File>
           </Files>
         </Group>
