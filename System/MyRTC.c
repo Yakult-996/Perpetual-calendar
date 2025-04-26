@@ -1,7 +1,7 @@
 #include "stm32f10x.h"                  // Device header
 #include <time.h>
 
-uint16_t MyRTC_Time[] = {2025, 4, 15, 12, 00, 00, 1};			//定义全局的时间数组，数组内容分别为年、月、日、时、分、秒、星期（北京时间）
+uint16_t MyRTC_Time[] = {2025, 4, 24, 18, 00, 00, 4};			//定义全局的时间数组，数组内容分别为年、月、日、时、分、秒、星期（北京时间）
 const char* weekStr[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 void MyRTC_SetTime(void);				//函数声明
@@ -11,6 +11,8 @@ void MyRTC_SetTime(void);				//函数声明
   * 参    数：无
   * 返 回 值：无
   */
+
+
 void MyRTC_Init(void)
 {
 	/*开启时钟*/
@@ -49,44 +51,45 @@ void MyRTC_Init(void)
 //如果LSE无法起振导致程序卡死在初始化函数中
 //可将初始化函数替换为下述代码，使用LSI当作RTCCLK
 //LSI无法由备用电源供电，故主电源掉电时，RTC走时会暂停
-/* 
-void MyRTC_Init(void)
-{
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP, ENABLE);
-	
-	PWR_BackupAccessCmd(ENABLE);
-	
-	if (BKP_ReadBackupRegister(BKP_DR1) != 0xA5A5)
-	{
-		RCC_LSICmd(ENABLE);
-		while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) != SET);
-		
-		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
-		RCC_RTCCLKCmd(ENABLE);
-		
-		RTC_WaitForSynchro();
-		RTC_WaitForLastTask();
-		
-		RTC_SetPrescaler(40000 - 1);
-		RTC_WaitForLastTask();
-		
-		MyRTC_SetTime();
-		
-		BKP_WriteBackupRegister(BKP_DR1, 0xA5A5);
-	}
-	else
-	{
-		RCC_LSICmd(ENABLE);				//即使不是第一次配置，也需要再次开启LSI时钟
-		while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) != SET);
-		
-		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
-		RCC_RTCCLKCmd(ENABLE);
-		
-		RTC_WaitForSynchro();
-		RTC_WaitForLastTask();
-	}
-}*/
+
+//void MyRTC_Init(void)
+//{
+//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP, ENABLE);
+//	
+//	PWR_BackupAccessCmd(ENABLE);
+//	
+//	if (BKP_ReadBackupRegister(BKP_DR1) != 0xA5A5)
+//	{
+//		RCC_LSICmd(ENABLE);
+//		while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) != SET);
+//		
+//		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
+//		RCC_RTCCLKCmd(ENABLE);
+//		
+//		RTC_WaitForSynchro();
+//		RTC_WaitForLastTask();
+//		
+//		RTC_SetPrescaler(40000 - 1);
+//		RTC_WaitForLastTask();
+//		
+//		MyRTC_SetTime();
+//		
+//		BKP_WriteBackupRegister(BKP_DR1, 0xA5A5);
+//	}
+//	else
+//	{
+//		RCC_LSICmd(ENABLE);				//即使不是第一次配置，也需要再次开启LSI时钟
+//		while (RCC_GetFlagStatus(RCC_FLAG_LSIRDY) != SET);
+//		
+//		RCC_RTCCLKConfig(RCC_RTCCLKSource_LSI);
+//		RCC_RTCCLKCmd(ENABLE);
+//		
+//		RTC_WaitForSynchro();
+//		RTC_WaitForLastTask();
+//	}
+//}
+
 
 /**
   * 函    数：RTC设置北京（UTC+8）时间
