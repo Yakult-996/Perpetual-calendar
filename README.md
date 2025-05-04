@@ -6,7 +6,7 @@ A **perpetual calendar** project based on **STM32F103C8T6**, designed as a simpl
 
 未经允许禁止转载此代码，禁止商用/出售，仅限开源交流学习使用。
 
-代码作者：大连海事大学 牟峻永。
+代码作者：大连海事大学-牟峻永。
 
 ---
 
@@ -88,5 +88,3 @@ A **perpetual calendar** project based on **STM32F103C8T6**, designed as a simpl
   Board: `STM32F103C8T6`
 - 网络功能与天气功能已不再更新，可删除菜单中的天气选项  
   Network/weather features are no longer updated; feel free to remove the weather option from the menu
-
----
