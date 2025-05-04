@@ -4,6 +4,10 @@
 
 A **perpetual calendar** project based on **STM32F103C8T6**, designed as a simple embedded systems course project. Basic features such as time display, alarm, countdown, and lunar calendar conversion are implemented.
 
+未经允许禁止转载此代码，禁止商用/出售，仅限开源交流学习使用。
+
+代码作者：大连海事大学 牟峻永。
+
 ---
 
 ## ✅ 已实现功能 / Implemented Features (V1.0)
@@ -86,9 +90,3 @@ A **perpetual calendar** project based on **STM32F103C8T6**, designed as a simpl
   Network/weather features are no longer updated; feel free to remove the weather option from the menu
 
 ---
-
-## 🙌 欢迎参与 / Contribution
-
-欢迎 fork、issue 或 PR 来改进此项目。  
-Feel free to fork, open issues, or submit PRs to improve this project!
-
